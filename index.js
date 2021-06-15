@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 
 client.connect(err => {
     const productsCollection = client.db("eShop").collection("products");
+    const orderCollection = client.db("eShop").collection("orders");
 
     app.post('/addProduct', (req, res) => {
         const product = req.body;
