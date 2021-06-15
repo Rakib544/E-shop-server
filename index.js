@@ -7,22 +7,21 @@ require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.cjo8u.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.acxxo.mongodb.net/eShop?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.get('/', (req, res) => {
-    res.send('Hello I am now working on my yacht service project')
+    res.send('Hello Programmers! I am now currently working on my e-shop projects')
 })
 
 client.connect(err => {
-    const serviceCollection = client.db("yacht-service").collection("services");
-    const reviewCollection = client.db("yacht-service").collection("reviews");
-    const adminCollection = client.db("yacht-service").collection("admins");
-    const orderCollection = client.db("yacht-service").collection("orders");
+    const productsCollection = client.db("eShop").collection("products");
 
-    app.post('/addService', (req, res) => {
-        const service = req.body;
-        serviceCollection.insertOne(service)
+    app.post('/addProduct', (req, res) => {
+        const product = req.body;
+        
+        productsCollection.insertOne(product)
             .then(result => {
                 console.log(result.insertedCount)
                 res.send(result.insertedCount > 0)
@@ -32,50 +31,18 @@ client.connect(err => {
             })
     })
 
-    app.get('/allServices', (req, res) => {
-        serviceCollection.find({})
-        .toArray((err, services) => {
-            res.send(services)
+    app.get('/allProducts', (req, res) => {
+        productsCollection.find({})
+        .toArray((err, products) => {
+            res.send(products)
         })
     })
 
-    app.get('/findSingleService/:id', (req, res) => {
+    app.get('/findSingleProduct/:id', (req, res) => {
         const id=req.params.id;
-        serviceCollection.findOne({_id: ObjectId(`${id}`)})
+        productsCollection.findOne({_id: ObjectId(`${id}`)})
         .then(result => {
             res.send(result)
-        })
-    })
-
-    app.post('/addReview', (req, res) => {
-        const review = req.body;
-        reviewCollection.insertOne(review)
-        .then(result => {
-            console.log(result.insertedCount)
-            res.send(result.insertedCount > 0)
-        })
-    })
-
-    app.get('/allReviews', (req, res) => {
-        reviewCollection.find({})
-        .toArray((err, reviews) => {
-            res.send(reviews)
-        })
-    })
-
-    app.post('/addAdmin', (req, res) => {
-        const newAdmin = req.body;
-        adminCollection.insertOne(newAdmin)
-        .then(result => {
-            console.log(result.insertedCount)
-            res.send(result.insertedCount > 0)
-        })
-    })
-
-    app.get('/allAdmins', (req, res) => {
-        adminCollection.find({})
-        .toArray((err, admins) => {
-            res.send(admins)
         })
     })
 
@@ -121,6 +88,5 @@ client.connect(err => {
     })
    
 });
-
 
 app.listen(process.env.PORT || 8080);
