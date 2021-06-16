@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 client.connect(err => {
     const productsCollection = client.db("eShop").collection("products");
     const orderCollection = client.db("eShop").collection("orders");
+    const adminCollection = client.db("eShop").collection("admin");
 
     app.post('/addProduct', (req, res) => {
         const product = req.body;
@@ -63,30 +64,51 @@ client.connect(err => {
         })
     })
 
-    app.get('/usersOrders/:email', (req, res) => {
-        const email = req.params.email;
-        orderCollection.find({userEmail: `${email}`})
+    app.post('/userOrders', (req, res) => {
+        const email = req.body.email;
+        orderCollection.find({email: `${email}`})
         .toArray((err, orders) => {
             res.send(orders)
         })
     })
 
-    app.patch('/update', (req, res) => {
-        orderCollection.updateOne({_id: ObjectId(`${req.body.id}`)}, {
-            $set: {orderStatus: req.body.statusValue}
-        })
-        .then(result => {
-            res.send(result)
-        })
-    })
+    // app.patch('/update', (req, res) => {
+    //     productsCollection.updateOne({_id: ObjectId(`${req.body.id}`)}, {
+    //         $set: {orderStatus: req.body.statusValue}
+    //     })
+    //     .then(result => {
+    //         res.send(result)
+    //     })
+    // })
 
     app.delete('/delete', (req, res) => {
-        serviceCollection.deleteOne({_id: ObjectId(`${req.body.id}`)})
+        productsCollection.deleteOne({_id: ObjectId(`${req.body.id}`)})
         .then(result => {
             res.send(result.deletedCount > 0)
             console.log(result.deletedCount)
         })
     })
+
+    app.post('/addAdmin', (req, res) => {
+        const email = req.body;
+        
+        adminCollection.insertOne(email)
+            .then(result => {
+                console.log(result.insertedCount)
+                res.send(result.insertedCount > 0)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    })
+
+    app.get('/allAdmins', (req, res) => {
+        adminCollection.find({})
+        .toArray((err, admins) => {
+            res.send(admins)
+        })
+    })
+    
    
 });
 
